@@ -1,112 +1,174 @@
 import axios from 'axios';
-import React, {useState} from 'react'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Signup = () => {
-  // Initialize the hooks
-  const [username , setUsername]= useState(""); 
-  const[email, setEmail] = useState("");
-   const [password , setPassword]= useState(""); 
-   const [phone , setNumber]= useState(""); 
+  const [username, setUsername] = useState(""); 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState(""); 
+  const [phone, setNumber] = useState(""); 
 
+  const [loading, setLoading] = useState("");
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
-  console.log(username)
-  const[loading , setLoading] = useState("");
-  const[success , setSuccess] = useState("");
-  const[error, setError] = useState("");
-
-  // below is a function that will handle the submit action
-  const handleSubmit = async(e) =>{
-    // below we prevent our site from reloading
-    e.preventDefault()
-    // Update our loading hook with a message that will be displayed to the users who are trying to register
-    setLoading("Please wait as registration is in progress....")
-    try{
-      // create a form data object that will enable you to capture the four details
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading("Please wait as registration is in progress....");
+    setError("");
+    try {
       const formdata = new FormData();
+      formdata.append("username", username); 
+      formdata.append("email", email);
+      formdata.append("password", password);
+      formdata.append("phone", phone); 
 
-      // Insert the four details (username, email , password , phone )interms of  key - value pairs
-      formdata.append("username",username); 
-      formdata.append("email",email);
-      formdata.append("password",password);
-      formdata.append("phone",phone); 
-      
-      // by use of axiox we , can access the method post
-      const response = await axios.post("https://paul-mungah001.alwaysdata.net/api/signup",formdata)
-      // set back the loading to default
+      const response = await axios.post("https://paul-mungah001.alwaysdata.net/api/signup", formdata);
       setLoading("");
+      setSuccess(response.data.message);
 
-      // just inaces everything goes well, update the success hook with a message
-      setSuccess(response.data.message)
-
-      // clear your hooks
       setUsername("");
       setPassword("");
       setEmail("");
       setNumber("");
-      setTimeout(()=>{
-        setSuccess("");
-      },15000)
 
-
-
-    }
-    catch(error){
-
-      // Set the loadinng back to default
+      setTimeout(() => setSuccess(""), 15000);
+    } catch (error) {
       setLoading("");
-      // Update the error hook with the message given back from response
-      setError(error.message)
-
+      setError(error.message);
     }
-  }
+  };
 
   return (
-    <div className='row justify-content-center mt-4'>
-        <div className="card col-md-6 shadow">
-          <h1 className='text-primary'>Sign up</h1>
+    <div 
+      className="d-flex justify-content-center align-items-center"
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #667eea, #764ba2)",
+        padding: "20px"
+      }}
+    >
+      <div 
+        className="p-5 rounded-4 shadow-lg"
+        style={{
+          maxWidth: "450px",
+          width: "100%",
+          background: "rgba(255, 255, 255, 0.15)",
+          backdropFilter: "blur(15px)",
+          border: "1px solid rgba(255,255,255,0.3)",
+          color: "#fff",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.37)"
+        }}
+      >
+        <h1 className="mb-4 text-center text-white fw-bold" style={{ textShadow: "1px 1px 3px rgba(0,0,0,0.3)" }}>Sign Up</h1>
 
-          <h5 className="text-warning">{loading}</h5>
-          <h3 className="text-success">{success}</h3>
-          <h4 className="text-danger">{error}</h4>
+        {loading && <div className="alert alert-info">{loading}</div>}
+        {success && <div className="alert alert-success">{success}</div>}
+        {error && <div className="alert alert-danger">{error}</div>}
 
-          
-        
-          <form onSubmit={handleSubmit}>
-            <input type="text" placeholder='Enter the Username' className='form-control'
-            value = {username}
-            onChange={(e) => setUsername(e.target.value)}
-            required /> <br />
+        <form onSubmit={handleSubmit}>
+          <div className="mb-3">
+            <input
+              type="text"
+              placeholder="Username"
+              className="form-control form-control-lg"
+              value={username}
+              onChange={(e) => { setUsername(e.target.value); setError(""); }}
+              required
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                color: "#fff",
+                border: "none",
+                borderRadius: "10px",
+                padding: "12px",
+                transition: "all 0.3s"
+              }}
+            />
+          </div>
 
-            {/* {username} */}
+          <div className="mb-3">
+            <input
+              type="email"
+              placeholder="Email"
+              className="form-control form-control-lg"
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); setError(""); }}
+              required
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                color: "#fff",
+                border: "none",
+                borderRadius: "10px",
+                padding: "12px",
+                transition: "all 0.3s"
+              }}
+            />
+          </div>
 
-
-
-
-             <input type="email" placeholder='Enter the email address' className='form-control'
-              value = {email}
-             onChange = {(e) => setEmail(e.target.value)}
-             required /> <br /> 
-
-             {/* {email} */}
-              <input type="password" placeholder='Enter the Password' className='form-control' 
+          <div className="mb-3">
+            <input
+              type="password"
+              placeholder="Password"
+              className="form-control form-control-lg"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required /> <br />
-               <input type="tel" placeholder='Enter the mobile phone number' className='form-control'
-               value = {phone}
-               onChange = {(e) => setNumber(e.target.value) }
-               required
-               /> <br />
-               <input type="submit" value="Signup" className='btn  btn-primary' /> 
-               <br /> <br />
+              onChange={(e) => { setPassword(e.target.value); setError(""); }}
+              required
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                color: "#fff",
+                border: "none",
+                borderRadius: "10px",
+                padding: "12px",
+                transition: "all 0.3s"
+              }}
+            />
+          </div>
 
-               Already have an account?<Link to={'/signin'}>Signin</Link>
+          <div className="mb-3">
+            <input
+              type="tel"
+              placeholder="Phone"
+              className="form-control form-control-lg"
+              value={phone}
+              onChange={(e) => { setNumber(e.target.value); setError(""); }}
+              required
+              style={{
+                background: "rgba(255,255,255,0.2)",
+                color: "#fff",
+                border: "none",
+                borderRadius: "10px",
+                padding: "12px",
+                transition: "all 0.3s"
+              }}
+            />
+          </div>
 
-          </form>
-        </div>
+          <button
+            type="submit"
+            className="btn w-100 mb-3"
+            disabled={loading}
+            style={{
+              background: "linear-gradient(135deg, #667eea, #764ba2)",
+              color: "#fff",
+              fontWeight: "bold",
+              borderRadius: "10px",
+              padding: "12px 0",
+              boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+              transition: "all 0.3s"
+            }}
+            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
+            onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+          >
+            {loading ? "Signing up..." : "Sign Up"}
+          </button>
+
+          <p className="text-center mt-3" style={{ color: "#fff" }}>
+            Already have an account? <Link to="/signin" className="fw-bold text-decoration-none" style={{ color: "#ffd700" }}>Sign In</Link>
+          </p>
+        </form>
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Signup 
+export default Signup;
