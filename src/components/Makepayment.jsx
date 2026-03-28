@@ -1,124 +1,144 @@
-import axios from 'axios';
-import React, { useState } from 'react';
+import axios from 'axios'
+import React, { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import Loader from './Loader';
 
 const Makepayment = () => {
-  const { product } = useLocation().state || {};
-  const navigate = useNavigate();
-  const img_url = "https://paul-mungah001.alwaysdata.net/static/images/";
 
-  const [number, setNumber] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState("");
-  const [error, setError] = useState("");
+  const { product } = useLocation().state || {}
+  const navigate = useNavigate()
 
-  const handlesubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setSuccess("");
+  const img_url = "https://paul-mungah001.alwaysdata.net/static/images/"
 
-    try {
-      const formdata = new FormData();
-      formdata.append("phone", number);
-      formdata.append("amount", product.product_cost);
+  const [number , setNumber ] = useState("")
+  const [loading , setLoading] = useState(false);
+  const [success , setSuccess] = useState ("");
+  const [error , setError] = useState("");
 
-      const response = await axios.post("https://kbenkamotho.alwaysdata.net/api/mpesa_payment", formdata);
+  const handlesubmit = async (e) =>{
+    e.preventDefault()
+    setLoading(true)
 
-      setLoading(false);
-      setSuccess(response.data.message);
-    } catch (err) {
-      setLoading(false);
-      setError(err.message);
+    try{
+      const formdata = new FormData()
+      formdata.append("phone",number);
+      formdata.append("amount",product.product_cost)
+
+      const response = await axios.post("https://kbenkamotho.alwaysdata.net/api/mpesa_payment", formdata)
+
+      setLoading(false)
+      setSuccess(response.data.message)
     }
-  };
-
-  if (!product) {
-    return <h2 className="text-danger text-center mt-5">No product selected.</h2>;
+    catch(error){
+      setLoading(false)
+      setError(error.message)
+    }
   }
 
   return (
     <div 
-      className="d-flex flex-column align-items-center py-5"
-      style={{ minHeight: "100vh", background: "linear-gradient(135deg, #667eea, #764ba2)" }}
+      className="d-flex justify-content-center align-items-center vh-100"
+      style={{
+        background: "linear-gradient(135deg, #0f9d58, #34a853)",
+        fontFamily: "Segoe UI, sans-serif"
+      }}
     >
-      <h1 className="text-white mb-4" style={{ textShadow: "1px 1px 4px rgba(0,0,0,0.5)" }}>
-        Make Payment - Lipa na M-Pesa
-      </h1>
-
-      <button
-        className="btn btn-light mb-4"
-        onClick={() => navigate("/")}
-        style={{ fontWeight: "bold" }}
-      >
-        &larr; Back
-      </button>
 
       <div 
-        className="card p-4 shadow-lg rounded-4"
+        className="shadow-lg p-4"
         style={{
-          maxWidth: "500px",
-          width: "100%",
-          background: "rgba(255, 255, 255, 0.15)",
-          backdropFilter: "blur(15px)",
-          border: "1px solid rgba(255,255,255,0.3)",
-          color: "#fff"
+          width: "420px",
+          borderRadius: "20px",
+          background: "#fff"
         }}
       >
-        <img 
-          src={img_url + product.product_photo} 
-          alt={product.product_name} 
-          className="img-fluid rounded mb-3"
-          style={{ maxHeight: "250px", objectFit: "cover" }}
-        />
 
-        <div className="card-body text-center">
-          <h2 className="mb-2">{product.product_name}</h2>
-          <p>{product.product_description}</p>
-          <b className="text-warning mb-3 d-block">Ksh {product.product_cost}</b>
+        {/* Header */}
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <button 
+            className="btn btn-outline-success btn-sm"
+            onClick={()=>navigate("/")}
+          >
+            ← Back
+          </button>
 
-          <form onSubmit={handlesubmit}>
-            {loading && <Loader />}
-            {success && <h4 className="text-success">{success}</h4>}
-            {error && <h4 className="text-danger">{error}</h4>}
+          <h5 style={{color:"#0f9d58", fontWeight:"700"}}>
+            Lipa na M-Pesa 💳
+          </h5>
+        </div>
 
-            <input
+        {/* Product Image */}
+        <div className="text-center mb-3">
+          <img 
+            src={img_url + product.product_photo} 
+            alt="Product"
+            style={{
+              width: "120px",
+              height: "120px",
+              objectFit: "cover",
+              borderRadius: "15px"
+            }}
+          />
+        </div>
+
+        {/* Product Info */}
+        <div className="text-center mb-3">
+          <h4 style={{fontWeight:"700"}}>{product.product_name}</h4>
+          <p className="text-muted" style={{fontSize:"14px"}}>
+            {product.product_description}
+          </p>
+          <h5 style={{color:"#fbbc05", fontWeight:"700"}}>
+            KES {product.product_cost}
+          </h5>
+        </div>
+
+        {/* Messages */}
+        {loading && <Loader/>}
+        {success && <div className="alert alert-success text-center py-2">{success}</div>}
+        {error && <div className="alert alert-danger text-center py-2">{error}</div>}
+
+        {/* Form */}
+        <form onSubmit={handlesubmit}>
+
+          <div className="mb-3">
+            <input 
               type="number"
-              className="form-control mb-3"
-              placeholder="Enter Phone number 254XXXXXXX"
+              className="form-control"
+              placeholder="📱 2547XXXXXXXX"
               required
               value={number}
               onChange={(e) => setNumber(e.target.value)}
               style={{
-                borderRadius: "10px",
+                borderRadius: "30px",
                 padding: "12px",
-                background: "rgba(255,255,255,0.2)",
-                color: "#fff",
-                border: "none",
-                transition: "all 0.3s"
+                border: "1px solid #ddd"
               }}
             />
+          </div>
 
-            <input
-              type="submit"
-              value="Make Payment"
-              className="btn w-100 btn-success"
-              style={{
-                padding: "12px",
-                borderRadius: "10px",
-                fontWeight: "bold",
-                transition: "all 0.3s",
-                boxShadow: "0 4px 10px rgba(0,0,0,0.3)"
-              }}
-              onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.05)"}
-              onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
-            />
-          </form>
-        </div>
+          <button 
+            type="submit"
+            className="w-100"
+            style={{
+              background: "#0f9d58",
+              color: "#fff",
+              border: "none",
+              padding: "12px",
+              borderRadius: "30px",
+              fontWeight: "600",
+              transition: "0.3s"
+            }}
+            onMouseOver={(e)=> e.target.style.background = "#0c7c45"}
+            onMouseOut={(e)=> e.target.style.background = "#0f9d58"}
+          >
+            Pay Now 💰
+          </button>
+
+        </form>
+
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Makepayment;
+export default Makepayment

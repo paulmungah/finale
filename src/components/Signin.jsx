@@ -1,96 +1,153 @@
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 
 const Signin = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
+  const[email, setEmail] = useState("");
+  const[password, setPassword]= useState("");
+
+  const [loading, setLoading] = useState("");
+  const [success , setSuccess]=useState("");
   const [error, setError] = useState("");
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
-  const handleSubmit = async (e) => {
+  const handlesubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
+    setLoading("Please wait while we authenticate your account...");
 
-    try {
-      const response = await axios.post(
-        "https://paul-mungah001.alwaysdata.net/api/login",
-        { email, password },
-        { headers: { "Content-Type": "application/json" } }
-      );
+    try{ 
+      const data = new FormData()
+      data.append("email",email);
+      data.append("password",password);
 
-      setLoading(false);
+      const response =  await axios.post("https://paul-mungah001.alwaysdata.net/api/login",data);
 
-      if (response.data) {
+      setLoading("");
+
+      if(response.data){
         navigate("/");
-      } else {
-        setError("Login failed. Please check your credentials.");
       }
-    } catch (err) {
-      console.error(err);
-      setLoading(false);
-      setError(err.response?.data?.message || "Login failed. Try again later.");
+      else{
+        setError("Login failed. Please try again........");
+      }
+    }
+    catch(error){
+      setLoading("");
+      setError("login failed.try again later.......");
     }
   };
 
   return (
     <div 
-      className='d-flex justify-content-center align-items-center'
-      style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #667eea, #764ba2)' }}
+      className="d-flex justify-content-center align-items-center vh-100"
+      style={{ background: "linear-gradient(135deg, #4F46E5, #6366F1)" }}
     >
+      
       <div 
-        className='p-5 rounded shadow-lg text-center'
-        style={{ maxWidth: '400px', width: '100%', backgroundColor: 'white' }}
+        className="card shadow-lg border-0 p-4"
+        style={{ width: "400px", borderRadius: "20px", backgroundColor: "#FFFFFF" }}
       >
-        <h1 className='mb-4 text-primary'>Sign In</h1>
         
-        {loading && <div className='alert alert-info'>{loading ? "Please wait while we authenticate your account..." : ""}</div>}
-        {error && <div className='alert alert-danger'>{error}</div>}
+        {/* Header */}
+        <div className="text-center mb-4">
+          <h2 className="fw-bold" style={{ color: "#4F46E5" }}>
+            Welcome Back 👋
+          </h2>
+          <p className="text-muted">Sign in to continue</p>
+        </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className='mb-3 text-start'>
-            <label className='form-label fw-bold'>Email</label>
+        {/* Messages */}
+        {loading && (
+          <div className="alert alert-info py-2 text-center">
+            {loading}
+          </div>
+        )}
+        {success && (
+          <div className="alert alert-success py-2 text-center">
+            {success}
+          </div>
+        )}
+        {error && (
+          <div className="alert alert-danger py-2 text-center">
+            {error}
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handlesubmit}>
+
+          {/* Email */}
+          <div className="mb-3">
+            <label className="form-label fw-semibold">Email</label>
             <input 
               type="email"
-              placeholder='Enter your email'
-              className='form-control form-control-lg'
-              required
+              placeholder="Enter your email"
+              className="form-control"
+              style={{
+                borderRadius: "30px",
+                padding: "10px 15px",
+                border: "1px solid #ddd"
+              }}
+              required 
               value={email}
-              onChange={(e) => { setEmail(e.target.value); setError(""); }}
+              onChange={(e)=> setEmail(e.target.value)}
             />
           </div>
 
-          <div className='mb-3 text-start'>
-            <label className='form-label fw-bold'>Password</label>
+          {/* Password */}
+          <div className="mb-3">
+            <label className="form-label fw-semibold">Password</label>
             <input 
               type="password"
-              placeholder='Enter your password'
-              className='form-control form-control-lg'
-              required
+              placeholder="Enter your password"
+              className="form-control"
+              style={{
+                borderRadius: "30px",
+                padding: "10px 15px",
+                border: "1px solid #ddd"
+              }}
+              required 
               value={password}
-              onChange={(e) => { setPassword(e.target.value); setError(""); }}
+              onChange={(e)=>setPassword(e.target.value)}
             />
           </div>
 
+          {/* Button */}
           <button 
             type="submit"
-            className='btn btn-primary btn-lg w-100 mb-3'
-            disabled={loading}
-            style={{ backgroundColor: '#667eea', borderColor: '#667eea' }}
+            className="w-100 fw-bold"
+            style={{
+              backgroundColor: "#4F46E5",
+              color: "#fff",
+              border: "none",
+              borderRadius: "30px",
+              padding: "10px",
+              transition: "0.3s"
+            }}
+            onMouseOver={(e) => e.target.style.backgroundColor = "#4338CA"}
+            onMouseOut={(e) => e.target.style.backgroundColor = "#4F46E5"}
           >
-            {loading ? "Signing in..." : "Sign In"}
+            Sign In
           </button>
 
-          <p className='text-muted'>
-            Don't have an account? <Link to='/signup' className='text-decoration-none fw-bold'>Sign up</Link>
-          </p>
+          {/* Footer */}
+          <div className="text-center mt-3">
+            <small className="text-muted">
+              Don’t have an account?{" "}
+              <Link 
+                to="/signup" 
+                style={{ color: "#4F46E5", textDecoration: "none", fontWeight: "600" }}
+              >
+                Sign up
+              </Link>
+            </small>
+          </div>
+
         </form>
       </div>
     </div>
-  );
-};
+  )
+}
 
 export default Signin;
