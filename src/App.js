@@ -7,12 +7,14 @@ import Addproducts from './components/Addproducts';
 import Getproducts from './components/Getproducts';
 import Loader from './components/Loader';
 import Makepayment from './components/Makepayment';
-import Footer from './components/Footer'; // ✅ ADD THIS
+import Footer from './components/Footer';
+
 
 function App() {
   return (
     <Router>
       <div>
+        
 
         {/* ✅ Navbar */}
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
@@ -52,7 +54,7 @@ function App() {
                       "nav-link " + (isActive ? "fw-bold text-primary" : "")
                     }
                   >
-                    Add Products
+                    Add Instruments
                   </NavLink>
                 </li>
               </ul>
@@ -79,6 +81,7 @@ function App() {
         {/* ✅ Main Content */}
         <div className="container mt-4">
           <Routes>
+             
             <Route path="/" element={<Getproducts />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/signin" element={<Signin />} />
