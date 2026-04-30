@@ -34,7 +34,7 @@ const Signin = () => {
       setSuccess("🎵 Welcome back! Redirecting to Music Base...");
 
       setTimeout(() => {
-        navigate('/');
+        navigate('/getproducts');
       }, 1800);
 
     } catch (err) {

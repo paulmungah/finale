@@ -80,7 +80,7 @@ const Signup = () => {
 
       // Redirect to Products page (Home) after success
       setTimeout(() => {
-        navigate('/');
+        navigate('/getproducts');
       }, 1800);
 
     } catch (err) {

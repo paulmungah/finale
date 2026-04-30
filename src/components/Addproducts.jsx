@@ -1,32 +1,54 @@
 import React, { useState, useRef } from "react";
 import axios from "axios";
-
-// Dummy Loader component (replace with your Loader if you have one)
-const Loader = () => (
-  <div className="text-center my-3">
-    <div className="spinner-border text-light" role="status">
-      <span className="visually-hidden">Loading...</span>
-    </div>
-  </div>
-);
+import { motion, AnimatePresence } from "framer-motion";
+import confetti from "canvas-confetti";
 
 const AddProducts = () => {
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [productCost, setProductCost] = useState("");
   const [productPhoto, setProductPhoto] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [popup, setPopup] = useState({ type: "", message: "", visible: false });
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
 
   const fileInputRef = useRef(null);
 
-  const showPopup = (type, message) => {
-    setPopup({ type, message, visible: true });
-    setTimeout(() => setPopup({ type: "", message: "", visible: false }), 4000);
+  // Special Confetti Effect
+  const triggerSpecialConfetti = () => {
+    confetti({
+      particleCount: 220,
+      spread: 100,
+      origin: { y: 0.7 },
+      colors: ['#ff00ff', '#00ffff', '#ffff00', '#ff9900']
+    });
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProductPhoto(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const removePhoto = () => {
+    setProductPhoto(null);
+    setPreviewUrl(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!productName || !productDescription || !productCost || !productPhoto) {
+      setError("All fields are required to add your instrument");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -36,176 +58,416 @@ const AddProducts = () => {
       formData.append("product_cost", productCost);
       if (productPhoto) formData.append("product_photo", productPhoto);
 
-      const response = await axios.post(
+      await axios.post(
         "https://paul-mungah001.alwaysdata.net/api/add_product",
         formData
       );
 
-      showPopup("success", response.data.message);
+      setSuccess("✨ Instrument successfully added to the Music Base vault!");
+      triggerSpecialConfetti();
 
-      setProductName("");
-      setProductDescription("");
-      setProductCost("");
-      setProductPhoto(null);
-      fileInputRef.current.value = "";
+      // Reset form after successful submission
+      setTimeout(() => {
+        setProductName("");
+        setProductDescription("");
+        setProductCost("");
+        setProductPhoto(null);
+        setPreviewUrl(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+      }, 1500);
+
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.message || err.response?.statusText || err.message || "Something went wrong";
-      showPopup("error", errorMessage);
+      setError(
+        err.response?.data?.message || 
+        "Failed to add instrument. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="container my-5">
-      <div className="row justify-content-center">
-        <div className="col-lg-6 col-md-8">
-          <div className="card shadow-lg rounded-4 border-0 p-4 gradient-card">
-            <h2 className="text-center text-white mb-4">🎵 Add New Instrument</h2>
+    <div style={styles.wrapper}>
+      {/* Neon Grid Background */}
+      <div style={styles.gridBackground} />
 
-            {loading && <Loader />}
+      {/* Floating Vinyl Decorations */}
+      <motion.div 
+        style={styles.vinyl1} 
+        animate={{ rotate: 360 }} 
+        transition={{ duration: 35, repeat: Infinity, ease: "linear" }} 
+      />
+      <motion.div 
+        style={styles.vinyl2} 
+        animate={{ rotate: -360 }} 
+        transition={{ duration: 45, repeat: Infinity, ease: "linear" }} 
+      />
 
-            {/* Popup Message */}
-            {popup.visible && (
-              <div className={`popup-message ${popup.type === "success" ? "popup-success" : "popup-error"}`}>
-                {popup.message}
-              </div>
-            )}
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.88 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.9, ease: "backOut" }}
+        style={styles.card}
+      >
+        <div style={styles.headerGlow} />
 
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <input
-                  type="text"
-                  placeholder="Product Name"
-                  className="form-control shadow-sm rounded-pill form-input"
-                  required
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
-                />
-              </div>
+        <div style={styles.header}>
+          <div style={styles.iconContainer}>
+            <span style={styles.mainIcon}>🎛️</span>
+          </div>
+          <h1 style={styles.title}>STUDIO DROP</h1>
+          <p style={styles.subtitle}>Add a new sound to the collective</p>
+        </div>
 
-              <div className="mb-3">
-                <textarea
-                  placeholder="Product Description"
-                  className="form-control shadow-sm rounded-3 form-input"
-                  required
-                  value={productDescription}
-                  onChange={(e) => setProductDescription(e.target.value)}
-                  rows={4}
-                />
-              </div>
+        <AnimatePresence mode="wait">
+          {success && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              style={styles.successBox}
+            >
+              {success}
+            </motion.div>
+          )}
+          {error && (
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              style={styles.errorBox}
+            >
+              {error}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-              <div className="mb-3">
-                <input
-                  type="number"
-                  placeholder="Product Price"
-                  className="form-control shadow-sm rounded-pill form-input"
-                  required
-                  value={productCost}
-                  onChange={(e) => setProductCost(e.target.value)}
-                />
-              </div>
+        <form onSubmit={handleSubmit}>
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>INSTRUMENT NAME</label>
+            <input
+              type="text"
+              placeholder="What is this beauty called?"
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+              style={styles.input}
+              required
+            />
+          </div>
 
-              <div className="mb-3">
-                <label className="form-label fw-bold text-white">Upload Product Photo</label>
-                <input
-                  type="file"
-                  className="form-control shadow-sm rounded-pill form-input"
-                  ref={fileInputRef}
-                  accept="image/*"
-                  required
-                  onChange={(e) => setProductPhoto(e.target.files[0])}
-                />
-              </div>
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>STORY & SPECIFICATIONS</label>
+            <textarea
+              placeholder="Tell the community about this instrument... condition, history, why it's special..."
+              value={productDescription}
+              onChange={(e) => setProductDescription(e.target.value)}
+              style={styles.textarea}
+              rows={6}
+              required
+            />
+          </div>
 
-              {productPhoto && (
-                <div className="mb-3 text-center">
-                  <div className="preview-frame shadow-lg rounded-4">
-                    <img
-                      src={URL.createObjectURL(productPhoto)}
-                      alt="Preview"
-                      className="img-fluid rounded-4 preview-img"
-                    />
-                  </div>
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>PRICE (KES)</label>
+            <input
+              type="number"
+              placeholder="45000"
+              value={productCost}
+              onChange={(e) => setProductCost(e.target.value)}
+              style={styles.input}
+              required
+            />
+          </div>
+
+          {/* Photo Upload */}
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>VISUAL DROP</label>
+            <div 
+              style={styles.specialUploadArea} 
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                onChange={handlePhotoChange}
+                style={styles.hiddenInput}
+                required
+              />
+
+              {!previewUrl ? (
+                <div style={styles.uploadContent}>
+                  <div style={styles.uploadIconBig}>📷</div>
+                  <p style={styles.uploadText}>DROP YOUR PHOTO HERE</p>
+                  <small style={styles.uploadSub}>High quality • Well lit • Max 8MB</small>
+                </div>
+              ) : (
+                <div style={styles.previewWrapper}>
+                  <img src={previewUrl} alt="preview" style={styles.previewImage} />
+                  <button 
+                    type="button" 
+                    onClick={removePhoto} 
+                    style={styles.removePhotoBtn}
+                  >
+                    ✕
+                  </button>
                 </div>
               )}
-
-              <button
-                type="submit"
-                className="btn btn-gradient w-100 btn-lg shadow-lg"
-                disabled={loading}
-              >
-                {loading ? "Adding..." : "Add Product"}
-              </button>
-            </form>
+            </div>
           </div>
-        </div>
-      </div>
 
-      {/* Custom CSS */}
-      <style jsx>{`
-        .gradient-card {
-          background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
-          color: white;
-        }
-        .form-input:focus {
-          border-color: #ffdd59;
-          box-shadow: 0 0 10px rgba(255, 221, 89, 0.5);
-        }
-        .btn-gradient {
-          background: linear-gradient(90deg, #ff416c, #ff4b2b);
-          border: none;
-          color: white;
-          font-weight: bold;
-          transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .btn-gradient:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-        }
-        .preview-frame {
-          width: 100%;
-          max-width: 300px;
-          margin: 0 auto;
-          border: 3px dashed rgba(255, 255, 255, 0.5);
-          padding: 5px;
-        }
-        .preview-img {
-          max-height: 200px;
-          object-fit: cover;
-        }
-        .popup-message {
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          padding: 15px 25px;
-          border-radius: 12px;
-          font-weight: bold;
-          z-index: 9999;
-          animation: popupFade 0.5s ease-in-out;
-        }
-        .popup-success {
-          background: #4ade80;
-          color: #065f46;
-        }
-        .popup-error {
-          background: #f87171;
-          color: #7f1d1d;
-        }
-        @keyframes popupFade {
-          0% {
-            opacity: 0;
-            transform: translateY(-20px);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
+          <motion.button
+            type="submit"
+            disabled={loading}
+            style={styles.submitButton}
+            whileHover={{ scale: loading ? 1 : 1.02 }}
+            whileTap={{ scale: loading ? 1 : 0.985 }}
+          >
+            {loading ? "SENDING TO THE VAULT..." : "RELEASE INTO THE BASE"}
+          </motion.button>
+        </form>
+      </motion.div>
     </div>
   );
+};
+
+// ==================== STYLES ====================
+const styles = {
+  wrapper: {
+    minHeight: "100vh",
+    background: "#0a0a0f",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+    overflow: "hidden",
+    fontFamily: "'Inter', system-ui, sans-serif",
+  },
+
+  gridBackground: {
+    position: "absolute",
+    inset: 0,
+    backgroundImage: `
+      linear-gradient(rgba(100, 100, 255, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(100, 100, 255, 0.06) 1px, transparent 1px)
+    `,
+    backgroundSize: "50px 50px",
+    zIndex: 0,
+  },
+
+  vinyl1: {
+    position: "absolute",
+    width: "280px",
+    height: "280px",
+    background: "radial-gradient(circle, #1a1a2e 0%, #0a0a0f 70%)",
+    border: "12px solid #ff00ff",
+    borderRadius: "50%",
+    top: "15%",
+    left: "-80px",
+    opacity: 0.15,
+    zIndex: 1,
+  },
+
+  vinyl2: {
+    position: "absolute",
+    width: "220px",
+    height: "220px",
+    background: "radial-gradient(circle, #1a1a2e 0%, #0a0a0f 70%)",
+    border: "12px solid #00ffff",
+    borderRadius: "50%",
+    bottom: "20%",
+    right: "-60px",
+    opacity: 0.12,
+    zIndex: 1,
+  },
+
+  card: {
+    width: "100%",
+    maxWidth: "540px",
+    background: "rgba(15, 15, 35, 0.92)",
+    border: "1px solid rgba(120, 80, 255, 0.3)",
+    borderRadius: "24px",
+    padding: "48px 42px",
+    boxShadow: "0 0 80px rgba(80, 60, 255, 0.25)",
+    position: "relative",
+    zIndex: 2,
+  },
+
+  headerGlow: {
+    position: "absolute",
+    top: "-60px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: "140px",
+    height: "140px",
+    background: "radial-gradient(circle, rgba(180, 80, 255, 0.4), transparent)",
+    filter: "blur(40px)",
+    zIndex: -1,
+  },
+
+  header: {
+    textAlign: "center",
+    marginBottom: "40px",
+  },
+
+  iconContainer: {
+    marginBottom: "16px",
+  },
+
+  mainIcon: {
+    fontSize: "62px",
+    filter: "drop-shadow(0 0 20px #a855f7)",
+  },
+
+  title: {
+    fontSize: "38px",
+    fontWeight: "900",
+    background: "linear-gradient(90deg, #c084fc, #67e8f9, #f472b6)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    letterSpacing: "-2px",
+    margin: "0 0 8px 0",
+  },
+
+  subtitle: {
+    color: "#a5b4fc",
+    fontSize: "16px",
+    fontWeight: "500",
+  },
+
+  inputGroup: {
+    marginBottom: "28px",
+  },
+
+  label: {
+    color: "#c4b5fd",
+    fontSize: "13.5px",
+    letterSpacing: "1.5px",
+    fontWeight: "700",
+    marginBottom: "10px",
+  },
+
+  input: {
+    width: "100%",
+    padding: "18px 22px",
+    background: "rgba(30, 30, 60, 0.6)",
+    border: "1px solid rgba(167, 139, 250, 0.3)",
+    borderRadius: "16px",
+    color: "#e0e7ff",
+    fontSize: "17px",
+    outline: "none",
+  },
+
+  textarea: {
+    width: "100%",
+    padding: "18px 22px",
+    background: "rgba(30, 30, 60, 0.6)",
+    border: "1px solid rgba(167, 139, 250, 0.3)",
+    borderRadius: "16px",
+    color: "#e0e7ff",
+    fontSize: "16.5px",
+    resize: "vertical",
+    minHeight: "138px",
+    outline: "none",
+  },
+
+  specialUploadArea: {
+    border: "2px dashed #8b5cf6",
+    borderRadius: "20px",
+    padding: "50px 30px",
+    textAlign: "center",
+    cursor: "pointer",
+    transition: "all 0.4s ease",
+    background: "rgba(30, 30, 60, 0.4)",
+  },
+
+  uploadContent: {
+    color: "#a5b4fc",
+  },
+
+  uploadIconBig: {
+    fontSize: "58px",
+    marginBottom: "16px",
+  },
+
+  uploadText: {
+    fontSize: "18px",
+    fontWeight: "600",
+    marginBottom: "6px",
+  },
+
+  uploadSub: {
+    fontSize: "13.5px",
+    opacity: 0.8,
+  },
+
+  hiddenInput: {
+    display: "none",
+  },
+
+  previewWrapper: {
+    position: "relative",
+    borderRadius: "16px",
+    overflow: "hidden",
+  },
+
+  previewImage: {
+    width: "100%",
+    maxHeight: "280px",
+    objectFit: "cover",
+  },
+
+  removePhotoBtn: {
+    position: "absolute",
+    top: "12px",
+    right: "12px",
+    background: "rgba(0,0,0,0.75)",
+    color: "#fff",
+    border: "none",
+    width: "36px",
+    height: "36px",
+    borderRadius: "50%",
+    fontSize: "18px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  submitButton: {
+    width: "100%",
+    padding: "20px",
+    marginTop: "12px",
+    background: "linear-gradient(90deg, #7c3aed, #ec4899, #f43f5e)",
+    color: "#fff",
+    border: "none",
+    borderRadius: "16px",
+    fontSize: "17.5px",
+    fontWeight: "800",
+    letterSpacing: "1px",
+    cursor: "pointer",
+    boxShadow: "0 20px 40px rgba(124, 58, 237, 0.4)",
+  },
+
+  successBox: {
+    background: "rgba(163, 230, 187, 0.15)",
+    color: "#86efac",
+    padding: "18px",
+    borderRadius: "16px",
+    marginBottom: "24px",
+    textAlign: "center",
+    border: "1px solid #4ade80",
+  },
+
+  errorBox: {
+    background: "rgba(248, 113, 113, 0.15)",
+    color: "#fda4af",
+    padding: "18px",
+    borderRadius: "16px",
+    marginBottom: "24px",
+    textAlign: "center",
+    border: "1px solid #f87171",
+  },
 };
 
 export default AddProducts;
