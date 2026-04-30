@@ -38,7 +38,7 @@ function App() {
               <ul className="navbar-nav me-auto">
                 <li className="nav-item">
                   <NavLink 
-                    to="/" 
+                    to="/getproducts" 
                     className={({ isActive }) => 
                       "nav-link " + (isActive ? "fw-bold text-primary" : "")
                     }
@@ -64,7 +64,7 @@ function App() {
                   Sign In
                 </NavLink>
 
-                <NavLink to="/signup" className="btn btn-primary btn-sm">
+                <NavLink to="/" className="btn btn-primary btn-sm">
                   Sign Up
                 </NavLink>
               </div>
@@ -82,8 +82,8 @@ function App() {
         <div className="container mt-4">
           <Routes>
              
-            <Route path="/" element={<Getproducts />} />
-            <Route path="/signup" element={<Signup />} />
+            <Route path="/getproducts" element={<Getproducts />} />
+            <Route path="/" element={<Signup />} />
             <Route path="/signin" element={<Signin />} />
             <Route path="/addproducts" element={<Addproducts />} />
             <Route path="/loader" element={<Loader />} />
