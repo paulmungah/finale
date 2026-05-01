@@ -7,8 +7,13 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 const Getproducts = () => {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  
+  // Navigation States
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
 
   const navigate = useNavigate();
   const img_url = "https://paul-mungah001.alwaysdata.net/static/images/";
@@ -18,6 +23,7 @@ const Getproducts = () => {
     try {
       const response = await axios.get("https://paul-mungah001.alwaysdata.net/api/get_product");
       setProducts(response.data);
+      setFilteredProducts(response.data);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -28,6 +34,22 @@ const Getproducts = () => {
   useEffect(() => {
     fetchProducts();
   }, []);
+
+  // Filter Logic
+  useEffect(() => {
+    let result = products;
+    if (activeCategory !== "All") {
+      result = result.filter(p => p.category === activeCategory); 
+    }
+    if (searchTerm) {
+      result = result.filter(p => 
+        p.product_name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    setFilteredProducts(result);
+  }, [searchTerm, activeCategory, products]);
+
+  const categories = ["All", ...new Set(products.map(p => p.category).filter(Boolean))];
 
   return (
     <div
@@ -41,7 +63,7 @@ const Getproducts = () => {
         paddingBottom: "50px"
       }}
     >
-      {/* 🎡 Compact Carousel Section */}
+      {/* 🎡 Compact Carousel Section - FULLY REINSTATED */}
       <div className="container">
         <div 
           id="productCarousel" 
@@ -121,14 +143,39 @@ const Getproducts = () => {
             🎵 Explore Our Music Store
           </h2>
 
+          {/* 🔍 Navigation Bar added here for your 50 products */}
+          <div className="row mb-4 g-3">
+            <div className="col-md-7">
+              <input 
+                type="text" 
+                className="form-control border-0 shadow-sm" 
+                placeholder="Search instruments by name..."
+                style={{ padding: "12px" }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="col-md-5 d-flex gap-2 justify-content-md-end overflow-auto pb-2">
+              {categories.map(cat => (
+                <button 
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`btn btn-sm text-nowrap ${activeCategory === cat ? 'btn-warning fw-bold' : 'btn-outline-light'}`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {loading && <Loader />}
           {error && <div className="alert alert-danger text-center">{error}</div>}
-          {!loading && !error && products.length === 0 && (
-            <div className="alert alert-warning text-center">No products available</div>
+          {!loading && !error && filteredProducts.length === 0 && (
+            <div className="alert alert-warning text-center">No products found matching your search</div>
           )}
 
           <div className="row g-4">
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <div key={product.id} className="col-12 col-sm-6 col-md-4 col-lg-3">
                 <div className="card h-100 shadow border-0 overflow-hidden">
                   <img
