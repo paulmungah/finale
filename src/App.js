@@ -11,6 +11,7 @@ import Getproducts from './components/Getproducts';
 import Loader from './components/Loader';
 import Makepayment from './components/Makepayment';
 import AboutUs from './components/AboutUs';
+import Lessons from './components/Lessons'; // ✅ Added Lessons Import
 import Footer from './components/Footer';
 
 function App() {
@@ -48,6 +49,16 @@ function App() {
                     style={({ isActive }) => isActive ? styles.activeLink : styles.navLink}
                   >
                     COLLECTION
+                  </NavLink>
+                </li>
+
+                {/* ✅ Added Lessons Link */}
+                <li className="nav-item">
+                  <NavLink 
+                    to="/lessons" 
+                    style={({ isActive }) => isActive ? styles.activeLink : styles.navLink}
+                  >
+                    LESSONS
                   </NavLink>
                 </li>
 
@@ -92,6 +103,7 @@ function App() {
             <Route path="/signin" element={<Signin />} />
             <Route path="/addproducts" element={<Addproducts />} />
             <Route path="/aboutus" element={<AboutUs />} />
+            <Route path="/lessons" element={<Lessons />} /> {/* ✅ Added Lessons Route */}
             <Route path="/loader" element={<Loader />} />
             <Route path="/makepayment" element={<Makepayment />} />
 
@@ -114,7 +126,7 @@ function App() {
 
       </div>
 
-      {/* Global CSS for Animations and Theme Overrides */}
+      {/* Global CSS */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;900&display=swap');
         
@@ -129,7 +141,6 @@ function App() {
           box-shadow: none;
         }
 
-        /* Hover Glow for Links */
         .nav-item a:hover {
           color: #00d2ff !important;
           text-shadow: 0 0 10px rgba(0, 210, 255, 0.4);
@@ -140,7 +151,6 @@ function App() {
           box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
         }
 
-        /* Smooth page transitions */
         main {
           animation: fadeIn 0.5s ease-in;
         }

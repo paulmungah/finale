@@ -32,7 +32,7 @@ const AboutUs = () => {
           <div className="col-lg-6">
             <h2 style={styles.sectionTitle}>OUR STORY</h2>
             <p style={styles.description}>
-              Founded in 2026, Music Base started in a small underground studio in Nairobi. 
+              Founded in 2026, Music Base started in a small underground studio in Eldoret. 
               We noticed a gap: artists had the talent, but lacked the gear and the platform 
               to reach a global audience. 
             </p>
