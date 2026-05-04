@@ -18,7 +18,7 @@ const Getproducts = () => {
   // Navigation States
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
-  const [sortOption, setSortOption] = useState("default");   // ← Added for sorting
+  const [sortOption, setSortOption] = useState("default");
 
   const navigate = useNavigate();
   const img_url = "https://paul-mungah001.alwaysdata.net/static/images/";
@@ -77,6 +77,13 @@ const Getproducts = () => {
   }, [searchTerm, activeCategory, sortOption, products]);
 
   const categories = ["All", ...new Set(products.map(p => p.category).filter(Boolean))];
+
+  // Reset All Filters
+  const resetFilters = () => {
+    setSearchTerm("");
+    setActiveCategory("All");
+    setSortOption("default");
+  };
 
   return (
     <div
@@ -170,9 +177,9 @@ const Getproducts = () => {
             🎵 Explore Our Music Store
           </h2>
 
-          {/* Navigation Bar with Sort Added */}
-          <div className="row mb-4 g-3">
-            <div className="col-md-5">
+          {/* Navigation Bar with Sort + Reset Button */}
+          <div className="row mb-4 g-3 align-items-end">
+            <div className="col-md-4">
               <input
                 type="text"
                 className="form-control border-0 shadow-sm"
@@ -183,7 +190,6 @@ const Getproducts = () => {
               />
             </div>
 
-            {/* New Sort Dropdown */}
             <div className="col-md-3">
               <select
                 className="form-select border-0 shadow-sm"
@@ -199,7 +205,7 @@ const Getproducts = () => {
               </select>
             </div>
 
-            <div className="col-md-4 d-flex gap-2 justify-content-md-end overflow-auto pb-2">
+            <div className="col-md-3 d-flex gap-2 justify-content-md-end overflow-auto pb-2">
               {categories.map(cat => (
                 <button
                   key={cat}
@@ -209,6 +215,17 @@ const Getproducts = () => {
                   {cat}
                 </button>
               ))}
+            </div>
+
+            {/* Reset Button */}
+            <div className="col-md-2">
+              <button
+                onClick={resetFilters}
+                className="btn btn-outline-danger w-100"
+                style={{ padding: "11px", fontWeight: "bold" }}
+              >
+                🔄 Reset All
+              </button>
             </div>
           </div>
 
