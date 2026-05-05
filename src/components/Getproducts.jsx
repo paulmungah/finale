@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Loader from './Loader';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import Chatbot from './Musicbot';
 
 const Getproducts = () => {
   const [products, setProducts] = useState([]);
@@ -14,15 +15,13 @@ const Getproducts = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [sortOption, setSortOption] = useState("default");
 
+  const [chatOpen, setChatOpen] = useState(false);
+
   const navigate = useNavigate();
   const img_url = "https://paul-mungah001.alwaysdata.net/static/images/";
 
-  // =========================
-  // 🔐 ONLY AUTH FIX (NO UI CHANGE)
-  // =========================
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     if (!token) {
       navigate("/signin");
     }
@@ -99,7 +98,87 @@ const Getproducts = () => {
       }}
     >
 
-      {/* 🎡 YOUR ORIGINAL CAROUSEL (UNCHANGED 100%) */}
+      {/* ── Floating Chatbot Trigger — BOTTOM LEFT ── */}
+      <div
+        onClick={() => setChatOpen(true)}
+        title="Music Base Assistant"
+        style={{
+          position: 'fixed',
+          bottom: '30px',
+          left: '24px',
+          zIndex: 1050,
+          cursor: 'pointer',
+          width: '56px',
+          height: '56px',
+        }}
+      >
+        <div
+          style={{
+            width: '56px',
+            height: '56px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #1a7a4a 0%, #25a065 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 16px rgba(26,122,74,0.50)',
+            transition: 'transform 0.18s ease, box-shadow 0.18s ease',
+            position: 'relative',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.transform = 'scale(1.12)';
+            e.currentTarget.style.boxShadow = '0 6px 22px rgba(26,122,74,0.65)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 4px 16px rgba(26,122,74,0.50)';
+          }}
+        >
+          <span style={{ fontSize: '24px', lineHeight: 1 }}>🎵</span>
+          <span style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '50%',
+            border: '2px solid rgba(26,122,74,0.5)',
+            animation: 'chatPulse 2s ease-out infinite',
+            pointerEvents: 'none',
+          }} />
+        </div>
+
+        {/* Tooltip */}
+        <div style={{
+          position: 'absolute',
+          left: '64px',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          background: '#1a7a4a',
+          color: '#fff',
+          fontSize: '12px',
+          fontWeight: 600,
+          padding: '4px 10px',
+          borderRadius: '8px',
+          whiteSpace: 'nowrap',
+          pointerEvents: 'none',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+        }}>
+          Music Base Assistant
+          <span style={{
+            position: 'absolute',
+            left: '-6px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            width: 0, height: 0,
+            borderTop: '5px solid transparent',
+            borderBottom: '5px solid transparent',
+            borderRight: '6px solid #1a7a4a',
+          }} />
+        </div>
+      </div>
+
+      {/* Chatbot */}
+      <Chatbot open={chatOpen} onClose={() => setChatOpen(false)} />
+
+      {/* CAROUSEL */}
       <div className="container">
         <div
           id="productCarousel"
@@ -107,7 +186,6 @@ const Getproducts = () => {
           data-bs-ride="carousel"
           style={{ maxWidth: "900px", borderRadius: "15px", overflow: "hidden" }}
         >
-
           <div className="carousel-indicators">
             <button type="button" data-bs-target="#productCarousel" data-bs-slide-to="0" className="active"></button>
             <button type="button" data-bs-target="#productCarousel" data-bs-slide-to="1"></button>
@@ -115,8 +193,6 @@ const Getproducts = () => {
           </div>
 
           <div className="carousel-inner">
-
-            {/* Slide 1 */}
             <div className="carousel-item active" data-bs-interval="3000">
               <img
                 src="/carousel/music 3.jpg"
@@ -130,7 +206,6 @@ const Getproducts = () => {
               </div>
             </div>
 
-            {/* Slide 2 */}
             <div className="carousel-item" data-bs-interval="3000">
               <img
                 src="/carousel/music 6.jpg"
@@ -144,7 +219,6 @@ const Getproducts = () => {
               </div>
             </div>
 
-            {/* Slide 3 */}
             <div className="carousel-item" data-bs-interval="3000">
               <img
                 src="/carousel/music4.jpg"
@@ -157,21 +231,18 @@ const Getproducts = () => {
                 <p className="fs-5">Expert guidance with every purchase</p>
               </div>
             </div>
-
           </div>
 
           <button className="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
             <span className="carousel-control-prev-icon"></span>
           </button>
-
           <button className="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
             <span className="carousel-control-next-icon"></span>
           </button>
-
         </div>
       </div>
 
-      {/* PRODUCTS SECTION (UNCHANGED) */}
+      {/* PRODUCTS SECTION */}
       <div className="container">
         <div style={{ backgroundColor: "rgba(0,0,0,0.7)", padding: "25px", borderRadius: "10px" }}>
 
@@ -180,7 +251,6 @@ const Getproducts = () => {
           </h2>
 
           <div className="row mb-4 g-3 align-items-end">
-
             <div className="col-md-4">
               <input
                 className="form-control"
@@ -221,32 +291,26 @@ const Getproducts = () => {
                 Reset
               </button>
             </div>
-
           </div>
 
           {loading && <Loader />}
           {error && <div className="alert alert-danger">{error}</div>}
 
           <div className="row g-4">
-
             {filteredProducts.map(product => (
               <div key={product.id} className="col-12 col-sm-6 col-md-4 col-lg-3">
-
                 <div className="card h-100 shadow border-0 overflow-hidden">
-
                   <img
                     src={product.product_photo ? img_url + product.product_photo : "https://via.placeholder.com/300"}
                     alt={product.product_name}
                     style={{ height: "200px", objectFit: "cover" }}
                   />
-
                   <div className="card-body d-flex flex-column">
                     <h5 className="fw-bold text-dark">{product.product_name}</h5>
                     <p className="text-muted small flex-grow-1">
                       {product.product_description?.slice(0, 80)}...
                     </p>
                     <h6 className="text-success fw-bold">Ksh {product.product_cost}</h6>
-
                     <button
                       className="btn btn-dark mt-2 w-100"
                       onClick={() => navigate("/makepayment", { state: { product } })}
@@ -254,16 +318,22 @@ const Getproducts = () => {
                       🛒 Purchase Now
                     </button>
                   </div>
-
                 </div>
-
               </div>
             ))}
-
           </div>
 
         </div>
       </div>
+
+      <style>{`
+        @keyframes chatPulse {
+          0%   { transform: scale(1);    opacity: 0.8; }
+          70%  { transform: scale(1.55); opacity: 0; }
+          100% { transform: scale(1.55); opacity: 0; }
+        }
+      `}</style>
+
     </div>
   );
 };
