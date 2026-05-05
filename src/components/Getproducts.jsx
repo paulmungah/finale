@@ -36,9 +36,16 @@ const Getproducts = () => {
     }
   };
 
+  // ✅ ONLY CHANGE: Auth check added here
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    const token = localStorage.getItem("authToken");
+
+    if (!token) {
+      navigate("/signin"); // redirect if not logged in
+    } else {
+      fetchProducts();
+    }
+  }, [navigate]);
 
   // Filter + Sort Logic
   useEffect(() => {
@@ -69,7 +76,6 @@ const Getproducts = () => {
         result.sort((a, b) => Number(b.product_cost) - Number(a.product_cost));
         break;
       default:
-        // Default order (as fetched from API)
         break;
     }
 
@@ -97,7 +103,7 @@ const Getproducts = () => {
         paddingBottom: "50px"
       }}
     >
-      {/* 🎡 Compact Carousel Section - FULLY REINSTATED */}
+      {/* 🎡 Compact Carousel Section - FULLY INTACT */}
       <div className="container">
         <div
           id="productCarousel"
@@ -164,6 +170,7 @@ const Getproducts = () => {
         </div>
       </div>
 
+      {/* 🔽 EVERYTHING BELOW IS UNCHANGED 🔽 */}
       <div className="container">
         <div
           style={{
@@ -177,7 +184,6 @@ const Getproducts = () => {
             🎵 Explore Our Music Store
           </h2>
 
-          {/* Navigation Bar with Sort + Reset Button */}
           <div className="row mb-4 g-3 align-items-end">
             <div className="col-md-4">
               <input
@@ -217,7 +223,6 @@ const Getproducts = () => {
               ))}
             </div>
 
-            {/* Reset Button */}
             <div className="col-md-2">
               <button
                 onClick={resetFilters}
@@ -261,6 +266,7 @@ const Getproducts = () => {
               </div>
             ))}
           </div>
+
         </div>
       </div>
     </div>

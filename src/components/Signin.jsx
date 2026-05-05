@@ -25,11 +25,15 @@ const Signin = () => {
       data.append("email", email);
       data.append("password", password);
 
-      await axios.post(
+      // 🔥 API CALL
+      const response = await axios.post(
         "https://paul-mungah001.alwaysdata.net/api/login", 
         data,
         { timeout: 12000 }
       );
+
+      // ✅ ONLY FIX ADDED HERE
+      localStorage.setItem("authToken", response.data?.token || "true");
 
       setSuccess("🎵 Welcome back! Redirecting to Music Base...");
 
